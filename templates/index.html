@@ -7,6 +7,17 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/styles.css">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Dashboard</title>
+
+    <!-- Add Chart.js CDN here -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Your custom styles -->
+    <link rel="stylesheet" href="/static/styles.css">
+
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -26,6 +37,7 @@
         </div>
     </nav>
 
+
     <div class="container mt-4">
         <!-- Trading Pairs Section -->
         <section id="tradePairs" class="mb-5">
@@ -35,10 +47,45 @@
             </div>
         </section>
 
+
+<div class="card">
+    <div class="card-body">
+        <h5 id="pair-symbol" class="card-title"></h5>
+        <p id="pair-price" class="card-text"></p>
+        <p class="card-text">
+            <span id="price-change" class="badge badge-success"></span>
+            <i class="fas fa-arrow-up"></i>
+        </p>
+    </div>
+</div>
+
+
+
         <!-- Calculator Section -->
         <section id="calculator">
             <h3 class="text-center">Risk and Reward Calculator</h3>
             <form id="calcForm" class="mt-4">
+                                <div id="pairs-container" class="row">
+    <!-- Card Example -->
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">BTC/USDT</h5>
+                <canvas id="chart-btc-usdt" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+                <div class="form-group col-md-6">
+    <label for="pair-select">Select Trading Pair</label>
+    <select id="pair-select" class="form-control">
+        <option value="">Select Pair</option>
+        <!-- Сюда будут добавляться опции для торговых пар -->
+    </select>
+</div>
+
+
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="current_price">Current Price (USDT)</label>
@@ -65,8 +112,11 @@
                         <input id="risk_percent" type="number" step="any" class="form-control" required>
                     </div>
                 </div>
+
                 <button type="submit" class="btn btn-primary btn-block">Calculate</button>
             </form>
+
+
 
             <div class="row mt-4">
                 <!-- Calculation results -->
@@ -79,6 +129,16 @@
                     <!-- Dynamic suggestion results will be inserted here -->
                 </div>
             </div>
+
+            <div id="calcResults" class="col-md-6 mt-3">
+    <h5>Calculated Levels</h5>
+    <ul>
+        <li>Stop Loss: <span id="stop-loss">-</span> USDT</li>
+        <li>Take Profit: <span id="take-profit">-</span> USDT</li>
+    </ul>
+</div>
+
+
         </section>
     </div>
 
@@ -86,6 +146,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="/static/script.js"></script>
+    <script src="/static/scripts.js"></script>
+
 </body>
 </html>

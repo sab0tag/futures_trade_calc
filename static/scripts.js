@@ -117,16 +117,19 @@ window.onload = function () {
 
             // Get the container for pairs
             const container = document.getElementById('pairs-container');
+            const pairSelect = document.getElementById('pair-select');
 
             // Clear any existing content
             container.innerHTML = '';
+            pairSelect.innerHTML = '<option value="">Select Pair</option>';
 
             // Loop through the received pairs and create cards
             data.forEach(pair => {
+                // Создание карты
                 const card = document.createElement('div');
                 card.classList.add('col-md-4');
                 card.innerHTML = `
-                    <div class="card">
+                    <div class="card" data-symbol="${pair.symbol}" data-current-price="${pair.current_price}" data-volume="${pair.volume}" data-price-change="${pair.price_change_24h}" data-spread="${pair.spread}" data-volatility="${pair.volatility}" data-high-price="${pair.high_price}" data-low-price="${pair.low_price}">
                         <div class="card-body">
                             <h5 class="card-title">${pair.symbol}</h5>
                             <p class="card-text">Current Price: ${pair.current_price} USDT</p>
@@ -140,7 +143,136 @@ window.onload = function () {
                     </div>
                 `;
                 container.appendChild(card);
+
+                // Добавляем торговую пару в выпадающий список
+                const option = document.createElement('option');
+                option.value = pair.symbol;
+                option.textContent = pair.symbol;
+                pairSelect.appendChild(option);
+            });
+
+            // Обработчик выбора торговой пары
+            pairSelect.addEventListener('change', function () {
+                const selectedSymbol = pairSelect.value;
+                const selectedCard = Array.from(container.getElementsByClassName('card'))
+                    .find(card => card.getAttribute('data-symbol') === selectedSymbol);
+
+                if (selectedCard) {
+                    const currentPrice = selectedCard.getAttribute('data-current-price');
+                    const volume = selectedCard.getAttribute('data-volume');
+                    const priceChange = selectedCard.getAttribute('data-price-change');
+                    const spread = selectedCard.getAttribute('data-spread');
+                    const volatility = selectedCard.getAttribute('data-volatility');
+                    const highPrice = selectedCard.getAttribute('data-high-price');
+                    const lowPrice = selectedCard.getAttribute('data-low-price');
+
+                    document.getElementById('current_price').value = currentPrice;
+                    document.getElementById('entry_price').value = currentPrice;
+                    document.getElementById('leverage').value = '';
+                    document.getElementById('position_size').value = '';
+                    document.getElementById('risk_percent').value = '';
+
+                    console.log('Selected Pair:', selectedSymbol);
+                    console.log('Current Price:', currentPrice);
+                    console.log('Volume:', volume);
+                    console.log('Price Change:', priceChange);
+                    console.log('Spread:', spread);
+                    console.log('Volatility:', volatility);
+                    console.log('High Price:', highPrice);
+                    console.log('Low Price:', lowPrice);
+                }
             });
         })
         .catch(error => console.error('Error fetching data:', error));
 };
+
+
+const fetchHistoricalData = async (pair) => {
+    const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${pair}&interval=1h&limit=24`);
+    const data = await response.json();
+    return data.map(d => ({
+        time: new Date(d[0]),
+        price: parseFloat(d[4]), // Closing price
+    }));
+};
+
+
+
+
+// Функция для загрузки данных
+async function fetchPairData(pair) {
+    try {
+        const response = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${pair}`);
+        const data = await response.json();
+
+        // Заполнение элементов данными
+        document.getElementById('pair-symbol').innerText = data.symbol;
+        document.getElementById('pair-price').innerText = `Current Price: ${data.lastPrice} USDT`;
+        document.getElementById('price-change').innerText = `+${data.priceChangePercent}%`;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+
+
+
+// Загружаем данные для пары, например, BTC/USDT
+fetchPairData('BTC-USDT');
+
+
+const renderChart = async (pair, chartId) => {
+    const historicalData = await fetchHistoricalData(pair);
+    const ctx = document.getElementById(chartId).getContext('2d');
+    const prices = historicalData.map(d => d.price);
+    const labels = historicalData.map(d => d.time.toLocaleTimeString());
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: `${pair} Price`,
+                data: prices,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+            },
+            scales: {
+                x: { title: { display: true, text: 'Time' } },
+                y: { title: { display: true, text: 'Price (USDT)' } },
+            },
+        },
+    });
+};
+
+// Example usage
+renderChart('BTCUSDT', 'chart-btc-usdt');
+
+if (typeof Chart !== 'undefined') {
+    // Proceed with rendering the chart
+    renderChart();
+} else {
+    console.error("Chart.js is not loaded.");
+}
+
+document.getElementById('calcForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const currentPrice = parseFloat(document.getElementById('current_price').value);
+    const entryPrice = parseFloat(document.getElementById('entry_price').value);
+    const riskPercent = parseFloat(document.getElementById('risk_percent').value);
+    const positionSize = parseFloat(document.getElementById('position_size').value);
+
+    const riskAmount = positionSize * (riskPercent / 100);
+    const stopLoss = entryPrice - (riskAmount / positionSize);
+    const takeProfit = entryPrice + (riskAmount / positionSize);
+
+    document.getElementById('stop-loss').textContent = stopLoss.toFixed(2);
+    document.getElementById('take-profit').textContent = takeProfit.toFixed(2);
+});

@@ -15,12 +15,10 @@ API_SECRET = os.getenv('BINANCE_API_SECRET')  # Enter your secret key
 # Binance client connection
 client = Client(API_KEY, API_SECRET)
 
-
 @app.route('/')
 def index():
     """Main page."""
     return render_template('index.html')
-
 
 @app.route('/data', methods=['GET'])
 def get_data():
@@ -45,7 +43,6 @@ def get_data():
                 spread = round(abs(ask_price - bid_price) / last_price * 100, 2)
                 volatility = round(abs(high_price - low_price) / last_price * 100, 2)
 
-
                 usdt_pairs.append({
                     'symbol': ticker['symbol'],
                     'current_price': last_price,
@@ -58,19 +55,23 @@ def get_data():
                 })
 
         # Sort by volume and select the top 10
-        sorted_pairs = sorted(usdt_pairs, key=lambda x: x['volume'], reverse=True)[:20]
+        sorted_pairs = sorted(usdt_pairs, key=lambda x: x['volume'], reverse=True)[:30]
 
         return jsonify(sorted_pairs)
     except Exception as e:
         print(f"Error fetching data: {str(e)}")  # Log the error
         return jsonify({'error': str(e)}), 500
 
-
 @app.route('/calculate', methods=['POST'])
 def calculate():
     """Calculate trading parameters based on input data."""
     data = request.json
     try:
+        # Ensure required fields are present
+        required_fields = ['entry_price', 'leverage', 'position_size', 'risk_percent', 'current_price']
+        if not all(field in data for field in required_fields):
+            return jsonify({'error': 'Missing required fields'}), 400
+
         # Extract data from the request
         entry_price = float(data['entry_price'])
         leverage = float(data['leverage'])
@@ -95,7 +96,8 @@ def calculate():
         })
     except (ValueError, KeyError) as e:
         return jsonify({'error': 'Invalid input or missing data: ' + str(e)}), 400
-
+    except Exception as e:
+        return jsonify({'error': 'An error occurred during calculation: ' + str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8282)
