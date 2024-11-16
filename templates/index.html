@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">Trading Dashboard</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#tradePairs">Trading Pairs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#calculator">Calculator</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Trading Pairs Section -->
+        <section id="tradePairs" class="mb-5">
+            <h3 class="text-center">Top Trading Pairs</h3>
+            <div class="row" id="pairs-container">
+                <!-- Cards for trading pairs will be dynamically inserted here -->
+            </div>
+        </section>
+
+        <!-- Calculator Section -->
+        <section id="calculator">
+            <h3 class="text-center">Risk and Reward Calculator</h3>
+            <form id="calcForm" class="mt-4">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="current_price">Current Price (USDT)</label>
+                        <input id="current_price" type="number" step="any" class="form-control" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="entry_price">Entry Price (USDT)</label>
+                        <input id="entry_price" type="number" step="any" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="leverage">Leverage (x)</label>
+                        <input id="leverage" type="number" step="any" class="form-control" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="position_size">Position Size ($)</label>
+                        <input id="position_size" type="number" step="any" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="risk_percent">Risk Percentage (%)</label>
+                        <input id="risk_percent" type="number" step="any" class="form-control" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Calculate</button>
+            </form>
+
+            <div class="row mt-4">
+                <!-- Calculation results -->
+                <div id="calcResults" class="col-md-6">
+                    <!-- Dynamic calculation results will be inserted here -->
+                </div>
+
+                <!-- Advice-based calculation results -->
+                <div id="adviceResults" class="col-md-6">
+                    <!-- Dynamic suggestion results will be inserted here -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Bootstrap JS and Dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/static/script.js"></script>
+</body>
+</html>
